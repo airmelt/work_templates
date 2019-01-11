@@ -3,7 +3,7 @@
 
 """
 @description: 新建导出文件
-@file_name: create_import.py
+@file_name: create_export.py
 @project: work
 @version: 1.0
 @date: 2019/1/11 13:45
