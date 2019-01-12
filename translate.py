@@ -120,7 +120,7 @@ def get_tkk():
 def translate(text):
     """
     翻译文本
-    :param text: 传入翻译文本fanyifwe4tfgfdgfdrt
+    :param text: 传入翻译文本
     :return: 翻译结果
     """
     text_tkk = get_tkk()
@@ -130,6 +130,7 @@ def translate(text):
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                 'Accept-Language': 'zh-CN,zh;q=0.8'
             }
+    js = Py4Js()
     url = build_url(text, js.get_tk(text, text_tkk))
     req = urllib.request.Request(url, None, headers, None, False)
     response = urllib.request.urlopen(req)
@@ -164,5 +165,4 @@ def excel2txt(input_file, row=0, begin_column=0, output_file='output.txt'):
 
 
 if __name__ == '__main__':
-    js = Py4Js()
     excel2txt(r'201802月新版居民.xls', 3, 1, 'output2.txt')

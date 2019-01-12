@@ -36,14 +36,13 @@ def excel2txt(input_file, row=0, begin_column=0, output_file='comment.txt'):
             f.write(item + '\n')
 
 
-def create_sql(table_name, table_comment, columns_file='output.txt', comment_file='comment.txt', output_file='mysql.sql'):
+def create_sql(table_name, table_comment, columns_file='output.txt', comment_file='comment.txt'):
     """
     输出sql语句文件
     :param table_name: 表名
     :param table_comment: 表注释
     :param columns_file: 传入表字段名文件, 默认为 output.txt
     :param comment_file: 传入表字段注释文件, 默认为 comment.txt
-    :param output_file: 传出sql语句文件, 默认为 mysql.sql
     :return:
     """
     # 标准化表名
@@ -52,7 +51,7 @@ def create_sql(table_name, table_comment, columns_file='output.txt', comment_fil
     with open(columns_file, 'r', encoding='utf-8') as f1, open(comment_file, 'r', encoding='utf-8') as f2:
         columns = f1.readlines()
         comments = f2.readlines()
-    with open(output_file, 'w', encoding='utf-8') as f3:
+    with open(table_name + '.sql', 'w', encoding='utf-8') as f3:
         f3.write("CREATE TABLE [dbo].[" + table_name + "] (\n")
         f3.write("  [PK_ID] int  IDENTITY(1,1) NOT NULL,\n")
         for i in range(columns.__len__()):
