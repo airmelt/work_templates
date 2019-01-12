@@ -122,3 +122,4 @@ dmypy.json
 *.java
 *.xlsx
 *.xls
+main.py
