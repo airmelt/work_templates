@@ -14,6 +14,7 @@ __author__ = 'air'
 
 import pandas as pd
 import util
+import re
 
 
 def excel2txt(input_file, row=0, begin_column=0, output_file='comment.txt'):
@@ -73,6 +74,59 @@ def create_sql(table_name, table_comment, columns_file='output.txt', comment_fil
         f3.write("'TABLE', N'" + table_name + "'\n")
 
 
+def mdx2update_sql(input_file, table_name):
+    """
+    mdx语句转换成sql的update语句
+    :param input_file:
+    :param table_name:
+    :return:
+    """
+    with open(input_file, 'r', encoding='utf-8') as f:
+        with open(input_file.replace('.txt', '_output.txt'), 'w', encoding='utf-8') as f2:
+            line = f.readline()
+            while line:
+                code_pattern = re.compile('\[Measures\].\[(.*)\]\s+AS')
+                indicator_code = code_pattern.findall(line)[0]
+                mdx_pattern = re.compile('AS\s+(.*)\s+,')
+                mdx_magnitude = mdx_pattern.findall(line)[0].strip()
+                format_pattern = re.compile('"(.*)"')
+                format_string = format_pattern.findall(line)[0]
+                sql = "UPDATE " + table_name + " SET MDX_MAGNITUDE = '" + \
+                      mdx_magnitude + "', FORMAT_STRING = '" + format_string + \
+                      "' , YEAR_ON_YEAR_FLAG = '1', RING_RATIO_FLAG = '1' WHERE INDICATOR_CODE = '" + \
+                      indicator_code + "';\n"
+                f2.write(sql)
+                line = f.readline()
+
+
+def mdx2insert_sql(input_file, comment_file, table_name, table_id):
+    with open(input_file, 'r', encoding='utf-8') as f, open(comment_file, 'r', encoding='utf-8') as f2:
+        with open(input_file.replace('.txt', '_output.txt'), 'w', encoding='utf-8') as f3:
+            line = f.readline()
+            indicator_name = f2.readline().strip()
+            i = 30
+            while line:
+                code_pattern = re.compile('\[Measures\].\[(.*)\]\s+AS')
+                indicator_code = code_pattern.findall(line)[0]
+                mdx_pattern = re.compile('AS\s+(.*)\s+,')
+                mdx_magnitude = mdx_pattern.findall(line)[0].strip()
+                format_pattern = re.compile('"(.*)"')
+                format_string = format_pattern.findall(line)[0]
+                # insert into table_name (a, b) values ('', '')
+                sql = "INSERT INTO " + table_name + \
+                      " (INDICATOR_NAME, INDICATOR_CODE, MDX_MAGNITUDE, FORMAT_STRING, " \
+                      "YEAR_ON_YEAR_FLAG, RING_RATIO_FLAG, SERIAL_NUMBER, STATUS, LEVEL, TABLE_ID) " \
+                      "VALUES ('" + indicator_name + "', '" + indicator_code + "', '" + mdx_magnitude + \
+                      "', '" + format_string + "', '1', '1', '" + str(i) + "', '1', '1', '" + table_id + \
+                      "');\n"
+                i = i + 1
+                f3.write(sql)
+                line = f.readline()
+                indicator_name = f2.readline().strip()
+
+
 if __name__ == '__main__':
     # excel2txt(r'201801新版职工.XLS', 3, 1)
-    create_sql('STAFF_MEDICARE_INSURANCE', '职工医疗保险定点结算表')
+    # create_sql('STAFF_MEDICARE_INSURANCE', '职工医疗保险定点结算表')
+    # mdx2update_sql('mdx_HIS.txt', 'INDICATOR_MANAGEMENT')
+    mdx2insert_sql('mdx_SCORE.txt', 'comment_score.txt', 'INDICATOR_MANAGEMENT', '2')

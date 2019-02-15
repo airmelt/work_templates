@@ -25,7 +25,7 @@ def reader_import(entity_name, columns_for_read, start_row_num):
         f.write('import com.yibo.modules.medicare.dao.' + entity_name + 'Dao;\n')
         f.write('import com.yibo.modules.medicare.entity.FileImport;\n')
         f.write('import com.yibo.modules.medicare.others.WorkConfig;\n')
-        f.write('import com.yibo.modules.medicare.reader.SqlStatement;')
+        f.write('import com.yibo.modules.medicare.reader.SqlStatement;\n')
         f.write('import org.apache.ibatis.session.SqlSession;\n')
         f.write('import org.apache.shiro.util.CollectionUtils;\n')
         f.write('import org.mybatis.spring.SqlSessionTemplate;\n\n')
@@ -57,7 +57,7 @@ def reader_import(entity_name, columns_for_read, start_row_num):
         f.write('                list = XLSXCovertCSVUtil.readXLSX(dataFile, 1, '
                 '' + start_row_num + ', columnsForRead);\n')
         f.write('            } else {\n')
-        f.write('                list = XLSXCovertCSVUtil.readXLSX(dataFile, 1, '
+        f.write('                list = XLSConvertCSVUtil.readXLS(dataFile, 1, '
                 '' + start_row_num + ', columnsForRead);\n')
         f.write('            }\n')
         f.write('            session = sqlSessionTemplate.getSqlSessionFactory().openSession();\n')
