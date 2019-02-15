@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 """
-@description: 新建导出文件
+@description: 新建导出文件/create file for exporting excel
 @file_name: create_export.py
 @project: work
 @version: 1.0

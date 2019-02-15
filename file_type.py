@@ -13,8 +13,12 @@
 import struct
 
 
-# 字节码转16进制字符串
 def bytes2hex(b):
+    """
+    字节码转16进制字符串
+    :param b: 传入字节码
+    :return: 
+    """
     num = len(b)
     hexstr = u""
     for i in range(num):
@@ -25,9 +29,13 @@ def bytes2hex(b):
     return hexstr.upper()
 
 
-# 获取文件类型
-def filetype(filename):
-    binfile = open(filename, 'rb')
+def file_type(file_name):
+    """
+    获取文件类型
+    :param file_name: 传入文件名称
+    :return: 
+    """
+    binfile = open(file_name, 'rb')
     binfile.seek(0)
     hb = struct.unpack_from("B" * 8, binfile.read(8))
     filecode = bytes2hex(hb)
@@ -35,11 +43,11 @@ def filetype(filename):
 
 
 if __name__ == '__main__':
-    # filetype("201810特殊病种.xls")
-    # filetype("特殊病种test.xls")
-    # filetype("居民特殊病种test.xls")
-    filetype("null-张春英-010广州市妇婴医院(医保局反馈汇总20180702)(成功).xlsx")
-    filetype("广州市妇女儿童医疗中心(6月份审核反馈).xlsx")
+    # file_type("201810特殊病种.xls")
+    # file_type("特殊病种test.xls")
+    # file_type("居民特殊病种test.xls")
+    file_type("null-张春英-010广州市妇婴医院(医保局反馈汇总20180702)(成功).xlsx")
+    file_type("广州市妇女儿童医疗中心(6月份审核反馈).xlsx")
 
 # result
 # 0900040002001000

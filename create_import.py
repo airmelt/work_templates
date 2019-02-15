@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 """
-@description: 新建导入文件
+@description: 新建导入文件/create file for importing excel
 @file_name: create_import.py
 @project: work_templates
 @version: 1.0
@@ -15,6 +15,13 @@ __author__ = 'air'
 
 
 def reader_import(entity_name, columns_for_read, start_row_num):
+    """
+    生成readerHelper文件
+    :param entity_name: 实体类名称
+    :param columns_for_read: 要读取的excel列数
+    :param start_row_num: 要读取的excel开始的行数
+    :return:
+    """
     columns_for_read = str(columns_for_read)
     start_row_num = str(start_row_num)
     table_name = util.table_name_standardize(entity_name)
@@ -112,6 +119,12 @@ def reader_import(entity_name, columns_for_read, start_row_num):
 
 
 def create_sql(entity_name, input_file='output.txt'):
+    """
+    生成sql文件
+    :param entity_name: 实体类名称
+    :param input_file: 传入文件名
+    :return:
+    """
     table_name = util.table_name_standardize(entity_name)
     with open('sql.txt', 'w', encoding='utf-8') as f:
         f.write('String INSERT_INTO_' + table_name + ' = "INSERT INTO ' + table_name + '(" +\n')

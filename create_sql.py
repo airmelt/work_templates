@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 """
-@description: 新建sql语句文件
+@description: 新建sql语句文件/create sql file
 @file_name: create_sql.py
 @project: work
 @version: 1.0
@@ -100,6 +100,14 @@ def mdx2update_sql(input_file, table_name):
 
 
 def mdx2insert_sql(input_file, comment_file, table_name, table_id):
+    """
+    将mdx语句转换成sql的insert语句
+    :param input_file: 传入文件
+    :param comment_file: 字段注释文件
+    :param table_name: 表名
+    :param table_id: 表编号
+    :return:
+    """
     with open(input_file, 'r', encoding='utf-8') as f, open(comment_file, 'r', encoding='utf-8') as f2:
         with open(input_file.replace('.txt', '_output.txt'), 'w', encoding='utf-8') as f3:
             line = f.readline()
