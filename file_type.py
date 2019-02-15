@@ -6,7 +6,7 @@
 @file_name: file_type.py
 @project: work
 @version: 1.0
-@date: 2019/11/21 13:45
+@date: 2018/11/21 13:45
 @author: air
 """
 
