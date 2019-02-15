@@ -124,3 +124,4 @@ dmypy.json
 *.xls
 main.py
 *.sql
+*.csv
