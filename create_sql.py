@@ -61,6 +61,12 @@ def create_sql(table_name, table_comment, columns_file='output.txt', comment_fil
         f3.write("WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, "
                  "IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)\n")
         f3.write(")\nGO\n\n")
+        f3.write("EXEC sp_addextendedproperty\n")
+        f3.write("'MS_Description', N'主键',\n")
+        f3.write("'SCHEMA', N'dbo',\n")
+        f3.write("'TABLE', N'CB_EXECUTE_DEPT_DETAIL',\n")
+        f3.write("'COLUMN', N'PK_ID'\n")
+        f3.write("GO\n\n")
         for i in range(columns.__len__()):
             f3.write("EXEC sp_addextendedproperty\n")
             f3.write("'MS_Description', N'" + comments[i].strip() + "',\n")
