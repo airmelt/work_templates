@@ -110,12 +110,11 @@ def service_export(entity_name, input_file='output.txt'):
         f.write('            for (' + entity_name + ' entity : list) {\n')
         f.write('                List<Object> objList = new ArrayList<>();\n')
         with open(input_file, 'r', encoding='utf-8') as f2:
-            item = string.capwords(f2.readline().strip().replace('_', ' ').lower())
-            item = ''.join(item.split(' '))
+            item = f2.readline().strip().title().replace('_', '')
             while item:
                 f.write('                objList.add(entity.get' + item + '());\n')
-                item = string.capwords(f2.readline().strip().replace('_', ' ').lower())
-                item = ''.join(item.split(' '))
+                item = f2.readline().strip().title().replace('_', '')
+        f.write('                data.add(objList);\n')
         f.write('            }\n        }\n        return data;\n    }\n')
 
 
@@ -156,19 +155,45 @@ def xml_export(table_name, input_file='output.txt', output_file='export_xml.txt'
         f.write('                ' + table_name + '.PK_ID = #{pkId,jdbcType=INTEGER}\n')
         f.write('            </if>\n')
         with open(input_file, 'r', encoding='utf-8') as f2:
-            column = f2.readline().strip()
-            class_property = string.capwords(column.replace('_', ' ').lower())
-            class_property = ''.join(class_property.split(' '))
-            while class_property:
-                f.write('            <if test="' + class_property + ' != null and ' + class_property + ' != \'\'">\n')
+            column = f2.readline().strip().title().replace('_', '')
+            while column:
+                f.write('            <if test="' + column + ' != null and ' + column + ' != \'\'">\n')
                 f.write('                AND ' + table_name + '.' + column + ' = #{'
-                        + class_property + ',jdbcType=VARCHAR}\n')
+                        + column + ',jdbcType=VARCHAR}\n')
                 f.write('            </if>\n')
                 column = f2.readline().strip()
-                class_property = string.capwords(column.replace('_', ' ').lower())
-                class_property = ''.join(class_property.split(' '))
+                column = string.capwords(column.replace('_', ' ').lower())
+                column = ''.join(column.split(' '))
         f.write('        </where>\n')
         f.write('        order by ' + table_name + '.PK_ID\n    </select>\n')
+
+
+def jsp_export(entity_name, package_name='medicare', input_file='output.txt', ):
+    with open(entity_name + 'Export.jsp', 'w', encoding='utf-8') as f:
+        f.write('            //数据导出功能\n')
+        f.write('            $(\'#exportBtn\').click(function () {\n')
+        with open(input_file, 'r', encoding='utf-8') as f2:
+            column = f2.readline().strip().title().replace('_', '')
+            column = column[0].lower() + column[1:]
+            while column:
+                f.write('            $(\'#export input[name="' + column +
+                        '"]\').val($.trim($("#dataTableBar #' + column + '").val()));\n')
+                column = f2.readline().strip().title().replace('_', '')
+                if column:
+                    column = column[0].lower() + column[1:]
+        f.write('                $("#export").submit();\n')
+        f.write('            });\n\n')
+        f.write('    <form id="export" enctype="application/x-www-form-urlencoded" method="post" style="display: none" '
+                'target="_blank" action="${ctx}/' + package_name + '/' + entity_name + '/export.json">\n')
+        with open(input_file, 'r', encoding='utf-8') as f2:
+            column = f2.readline().strip().title().replace('_', '')
+            column = column[0].lower() + column[1:]
+            while column:
+                f.write('        <input name="' + column + '">\n')
+                column = f2.readline().strip().title().replace('_', '')
+                if column:
+                    column = column[0].lower() + column[1:]
+        f.write('    </form>')
 
 
 if __name__ == '__main__':

@@ -58,10 +58,6 @@ def create_jsp(file_name, url, columns_file='output.txt', comments_file='comment
         f.write('            width: 80%;\n')
         f.write('            margin: 0;\n')
         f.write('        }\n')
-        f.write('        #searchForm table tr td input.calculate-btn{\n')
-        f.write('            width: 80%;\n')
-        f.write('            margin: 0;\n')
-        f.write('        }\n')
         f.write('        #searchForm table tr td input.combo-text{\n')
         f.write('            margin-right: 0;\n')
         f.write('        }\n')
@@ -83,7 +79,7 @@ def create_jsp(file_name, url, columns_file='output.txt', comments_file='comment
             titles = f3.readlines()
         for i in range(len(fields)):
             f.write('                    '
-                    '{field: \'' + fields[i].strip() + '\', title: \'' + titles[i].strip() + '\', width: 120},\n')
+                    '{field: \'' + fields[i].strip().title().replace('_', '') + '\', title: \'' + titles[i].strip() + '\', width: 120},\n')
         f.write('\n                ]]\n            });\n\n')
         f.write('            new CrudForm({datagrid: \'dataTable\'});\n\n')
         f.write('            $("#search").click(function() {\n')
