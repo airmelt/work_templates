@@ -77,6 +77,31 @@ def create_sql(table_name, table_comment, columns_file='output.txt', comment_fil
         f3.write("'TABLE', N'" + table_name + "'\n")
 
 
+def create_add_sql(table_name, columns_file='output.txt', comment_file='comment.txt'):
+    """
+    输出追加SQL字段sql语句文件
+    :param table_name: 表名
+    :param columns_file: 传入表字段名文件, 默认为 output.txt
+    :param comment_file: 传入表字段注释文件, 默认为 comment.txt
+    :return:
+    """
+    # 读取字段及注释
+    with open(columns_file, 'r', encoding='utf-8') as f1, open(comment_file, 'r', encoding='utf-8') as f2:
+        columns = f1.readlines()
+        comments = f2.readlines()
+    with open(table_name + '.sql', 'w', encoding='utf-8') as f3:
+        for i in range(columns.__len__()):
+            f3.write("ALTER TABLE [dbo].[" + table_name + "] ADD[" + columns[i].strip() + "] varchar(255) NULL\n")
+            f3.write("GO\n\n")
+        for i in range(columns.__len__()):
+            f3.write("EXEC sp_addextendedproperty\n")
+            f3.write("'MS_Description', N'" + comments[i].strip() + "',\n")
+            f3.write("'SCHEMA', N'dbo',\n")
+            f3.write("'TABLE', N'" + table_name + "',\n")
+            f3.write("'COLUMN', N'" + columns[i].strip() + "'\n")
+            f3.write("GO\n\n")
+
+
 def mdx2update_sql(input_file, table_name):
     """
     mdx语句转换成sql的update语句
