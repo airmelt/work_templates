@@ -13,7 +13,6 @@
 __author__ = 'air'
 
 import pandas as pd
-import util
 import re
 
 
@@ -46,8 +45,6 @@ def create_sql(table_name, table_comment, columns_file='output.txt', comment_fil
     :param comment_file: 传入表字段注释文件, 默认为 comment.txt
     :return:
     """
-    # 标准化表名
-    table_name = util.table_name_standardize(table_name)
     # 读取字段及注释
     with open(columns_file, 'r', encoding='utf-8') as f1, open(comment_file, 'r', encoding='utf-8') as f2:
         columns = f1.readlines()
