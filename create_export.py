@@ -5,7 +5,7 @@
 @description: 新建导出文件/create file for exporting excel
 @file_name: create_export.py
 @project: work
-@version: 1.0
+@version: 2.0
 @date: 2019/1/11 13:45
 @author: air
 """
@@ -16,31 +16,82 @@ import string
 import util
 
 
-def controller_export(filename, entity_name, input_file='comment.txt', output_file='controller_export.java'):
+def controller_export(entity_name, output_file='controller_export.java'):
     """
     创建Controller层export方法
-    :param entity_name: 导出的实体类名称
-    :param filename: 导出的函数名称
-    :param input_file: 传入的表头文件, 默认为 comment.txt
-    :param output_file: 传出的文件, 默认为 controller_export.java
+    :param entity_name: 传入实体类名称
+    :param output_file: 传出的Controller层方法文件
     :return:
     """
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write('    @RequestMapping(value="/export.json",method=RequestMethod.POST)\n')
         f.write('    public void export(HttpServletRequest request,HttpServletResponse response) {\n')
+        f.write('       ' + entity_name[0].lower() + entity_name[1:] + 'Service.export')
+        f.write(entity_name + '(request, response);\n    }\n')
+
+
+def service_export(filename, entity_name, package_name='medicare', input_file='output.txt', comment_file = 'comment.txt'):
+    """
+    创建Service层导出文件
+    :param filename: 导出的文件名
+    :param entity_name: 传入实体类名称
+    :param package_name: 实体类的包名
+    :param input_file: 传入数据库字段名称txt文件
+    :param comment_file: 传入的字段注释txt文件
+    :return:
+    """
+    output_file = entity_name + 'Service.java'
+    with open(output_file, 'w', encoding='utf-8') as f:
+        f.write('package com.yibo.modules.' + package_name + '.service;\n\n')
+        f.write('import com.yibo.core.common.service.CrudService;\n')
+        f.write('import com.yibo.core.common.utils.WebUtil;\n')
+        f.write('import org.springframework.beans.factory.annotation.Autowired;\n')
+        f.write('import org.springframework.stereotype.Service;\n')
+        f.write('import org.springframework.transaction.annotation.Transactional;\n')
+        f.write('import com.yibo.modules.' + package_name + '.entity.' + entity_name + ';\n')
+        f.write('import com.yibo.modules.' + package_name + '.dao.' + entity_name + 'Dao;\n\n')
+        f.write('import java.sql.SQLException;\n')
+        f.write('import java.util.ArrayList;\n')
+        f.write('import java.util.List;\n')
+        f.write('import java.util.Map;\n\n\n')
+        f.write('@Service\n')
+        f.write('@Transactional(readOnly = true)\n')
+        f.write('public class ' + entity_name + 'Service extends CrudService'
+                                                '<' + entity_name + 'Dao, ' + entity_name + 'His> {\n\n')
+        f.write('    @Autowired\n')
+        f.write('    private ' + entity_name + 'Dao ' + entity_name[0].lower() + entity_name[1:] + 'Dao;\n\n')
+        f.write('    private List<List<Object>> getExport() throws SQLException {\n')
+        f.write('        return export();\n    }\n\n')
+        f.write('    private List<List<Object>> export() throws SQLException {\n')
+        f.write('        List<List<Object>> data = new ArrayList<>();\n')
+        f.write('        // 获取传过来的查询参数\n')
+        f.write('        Map<String,Object> paramMap = WebUtil.getAllParameters();\n')
+        f.write('        List<' + entity_name + '> list = dao.getExport(paramMap);\n')
+        f.write('        if(list.size() > 0) {\n')
+        f.write('            for (' + entity_name + ' entity : list) {\n')
+        f.write('                List<Object> objList = new ArrayList<>();\n')
+        with open(input_file, 'r', encoding='utf-8') as f2:
+            item = f2.readline().strip().title().replace('_', '')
+            while item:
+                f.write('                objList.add(entity.get' + item + '());\n')
+                item = f2.readline().strip().title().replace('_', '')
+        f.write('                data.add(objList);\n')
+        f.write('            }\n        }\n        return data;\n    }\n\n')
+        f.write('    public void export' + entity_name +
+                '(HttpServletRequest request,HttpServletResponse response) {\n')
         f.write('        WebUtil.setRequest(request);\n')
         f.write('        // 创建一个文本输出流对象\n')
         f.write('        PrintWriter writer = null;\n')
         f.write('        try{\n')
         f.write('            writer = response.getWriter();\n')
         f.write('            List<String> header = new ArrayList<>();\n')
-        with open(input_file, 'r', encoding='utf-8') as f2:
+        with open(comment_file, 'r', encoding='utf-8') as f2:
             header = f2.readline().strip()
             while header:
                 f.write('            header.add("' + header + '");\n')
                 header = f2.readline().strip()
         f.write('            boolean pass = true;\n\n')
-        f.write('            List<List<Object>> data = ' + entity_name + 'Service.getExport();\n')
+        f.write('            List<List<Object>> data = getExport();\n')
         f.write('            if(CollectionUtils.isEmpty(data)) {\n')
         f.write('                pass = false;\n')
         f.write('                writer.print("没有符合查询条件的数据.");\n            }\n')
@@ -72,63 +123,18 @@ def controller_export(filename, entity_name, input_file='comment.txt', output_fi
         f.write('            }\n        }\n    }\n')
 
 
-def service_export(entity_name, input_file='output.txt'):
-    """
-    创建Service层导出文件
-    :param entity_name: 传入实体类名称
-    :param input_file: 传入数据库字段名称txt文件
-    :return:
-    """
-    output_file = entity_name + 'Service.java'
-    with open(output_file, 'w', encoding='utf-8') as f:
-        f.write('package com.yibo.modules.medicare.service;\n\n')
-        f.write('import com.yibo.core.common.service.CrudService;\n')
-        f.write('import com.yibo.core.common.utils.WebUtil;\n')
-        f.write('import org.springframework.beans.factory.annotation.Autowired;\n')
-        f.write('import org.springframework.stereotype.Service;\n')
-        f.write('import org.springframework.transaction.annotation.Transactional;\n')
-        f.write('import com.yibo.modules.medicare.entity.' + entity_name + ';\n')
-        f.write('import com.yibo.modules.medicare.dao.' + entity_name + 'Dao;\n\n')
-        f.write('import java.sql.SQLException;\n')
-        f.write('import java.util.ArrayList;\n')
-        f.write('import java.util.List;\n')
-        f.write('import java.util.Map;\n\n\n')
-        f.write('@Service\n')
-        f.write('@Transactional(readOnly = true)\n')
-        f.write('public class ' + entity_name + 'Service extends CrudService'
-                                                '<' + entity_name + 'Dao,' + entity_name + 'His> {\n\n')
-        f.write('    @Autowired\n')
-        f.write('    private ' + entity_name + 'Dao ' + entity_name + 'Dao;\n\n')
-        f.write('    public List<List<Object>> getExport() throws SQLException {\n')
-        f.write('        return export();\n    }\n')
-        f.write('    public List<List<Object>> export() throws SQLException {\n')
-        f.write('        List<List<Object>> data = new ArrayList<>();\n')
-        f.write('        // 获取传过来的查询参数\n')
-        f.write('        Map<String,Object> paramMap = WebUtil.getAllParameters();\n')
-        f.write('        List<' + entity_name + '> list = ' + entity_name + 'Dao.getExport(paramMap);\n')
-        f.write('        if(list.size() > 0) {\n')
-        f.write('            for (' + entity_name + ' entity : list) {\n')
-        f.write('                List<Object> objList = new ArrayList<>();\n')
-        with open(input_file, 'r', encoding='utf-8') as f2:
-            item = f2.readline().strip().title().replace('_', '')
-            while item:
-                f.write('                objList.add(entity.get' + item + '());\n')
-                item = f2.readline().strip().title().replace('_', '')
-        f.write('                data.add(objList);\n')
-        f.write('            }\n        }\n        return data;\n    }\n')
-
-
-def dao_export(entity_name):
+def dao_export(entity_name, package_name='medicare'):
     """
     创建dao层导出文件
     :param entity_name: 传入实体类名称
+    :param package_name: 实体类的包名
     :return:
     """
     output_file = entity_name + 'Dao.java'
     with open(output_file, 'w', encoding='utf-8') as f:
-        f.write('package com.yibo.modules.medicare.dao;\n\n')
+        f.write('package com.yibo.modules.' + package_name + '.dao;\n\n')
         f.write('import com.yibo.core.common.persistence.CrudDao;\n')
-        f.write('import com.yibo.modules.medicare.entity.' + entity_name + ';\n')
+        f.write('import com.yibo.modules.' + package_name + '.entity.' + entity_name + ';\n')
         f.write('import com.yibo.core.common.persistence.annotation.MyBatisDao;\n\n')
         f.write('import java.sql.SQLException;\n')
         f.write('import java.util.List;\n')
@@ -142,8 +148,8 @@ def xml_export(table_name, input_file='output.txt', output_file='export_xml.txt'
     """
     创建xml语句
     :param table_name: 传入表名称 驼峰式命名/下划线命名
-    :param input_file:
-    :param output_file:
+    :param input_file: 传入数据库字段名称txt文件
+    :param output_file: 输出xml文件
     :return:
     """
     table_name = util.table_name_standardize(table_name)
@@ -169,6 +175,13 @@ def xml_export(table_name, input_file='output.txt', output_file='export_xml.txt'
 
 
 def jsp_export(entity_name, package_name='medicare', input_file='output.txt', ):
+    """
+    jsp导出
+    :param entity_name: 传入实体类名称
+    :param package_name: 实体类的包名
+    :param input_file: 传入数据库字段名称txt文件
+    :return:
+    """
     with open(entity_name + 'Export.jsp', 'w', encoding='utf-8') as f:
         f.write('            //数据导出功能\n')
         f.write('            $(\'#exportBtn\').click(function () {\n')
@@ -181,10 +194,11 @@ def jsp_export(entity_name, package_name='medicare', input_file='output.txt', ):
                 column = f2.readline().strip().title().replace('_', '')
                 if column:
                     column = column[0].lower() + column[1:]
-        f.write('                $("#export").submit();\n')
+        f.write('           $("#export").submit();\n')
         f.write('            });\n\n')
         f.write('    <form id="export" enctype="application/x-www-form-urlencoded" method="post" style="display: none" '
-                'target="_blank" action="${ctx}/' + package_name + '/' + entity_name + '/export.json">\n')
+                'target="_blank" action="${ctx}/' + package_name + '/' + entity_name[0].lower() + entity_name[1:] +
+                '/export.json">\n')
         with open(input_file, 'r', encoding='utf-8') as f2:
             column = f2.readline().strip().title().replace('_', '')
             column = column[0].lower() + column[1:]
@@ -193,7 +207,9 @@ def jsp_export(entity_name, package_name='medicare', input_file='output.txt', ):
                 column = f2.readline().strip().title().replace('_', '')
                 if column:
                     column = column[0].lower() + column[1:]
-        f.write('    </form>')
+        f.write('    </form>\n\n')
+        f.write('            <a id="exportBtn" href="javascript:void(0)" class="easyui-linkbutton" '
+                'iconCls="icon-save" plain="true">数据导出</a>')
 
 
 if __name__ == '__main__':
