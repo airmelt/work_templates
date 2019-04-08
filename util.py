@@ -51,4 +51,6 @@ def entity_attributes_standardize(entity_name):
     :param entity_name: 传入字段字符串
     :return:
     """
+    if not entity_name:
+        return None
     return entity_name[0].lower() + entity_name.title().replace('_', '')[1:]
