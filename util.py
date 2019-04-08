@@ -43,3 +43,12 @@ def table_name_standardize(table_name):
     if is_underline_end:
         table_name = table_name[:-1]
     return table_name
+
+
+def entity_attributes_standardize(entity_name):
+    """
+    标准化属性
+    :param entity_name: 传入字段字符串
+    :return:
+    """
+    return entity_name[0].lower() + entity_name.title().replace('_', '')[1:]

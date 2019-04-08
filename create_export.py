@@ -186,14 +186,11 @@ def jsp_export(entity_name, package_name='medicare', input_file='output.txt', ):
         f.write('            //数据导出功能\n')
         f.write('            $(\'#exportBtn\').click(function () {\n')
         with open(input_file, 'r', encoding='utf-8') as f2:
-            column = f2.readline().strip().title().replace('_', '')
-            column = column[0].lower() + column[1:]
+            column = util.entity_attributes_standardize(f2.readline().strip())
             while column:
                 f.write('            $(\'#export input[name="' + column +
                         '"]\').val($.trim($("#dataTableBar #' + column + '").val()));\n')
-                column = f2.readline().strip().title().replace('_', '')
-                if column:
-                    column = column[0].lower() + column[1:]
+                column = util.entity_attributes_standardize(f2.readline().strip())
         f.write('           $("#export").submit();\n')
         f.write('            });\n\n')
         f.write('    <form id="export" enctype="application/x-www-form-urlencoded" method="post" style="display: none" '
