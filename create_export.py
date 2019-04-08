@@ -92,10 +92,10 @@ def service_export(filename, entity_name, package_name='medicare', input_file='o
                 header = f2.readline().strip()
         f.write('            boolean pass = true;\n\n')
         f.write('            List<List<Object>> data = getExport();\n')
-        f.write('            if(CollectionUtils.isEmpty(data)) {\n')
+        f.write('            if (CollectionUtils.isEmpty(data)) {\n')
         f.write('                pass = false;\n')
         f.write('                writer.print("没有符合查询条件的数据.");\n            }\n')
-        f.write('            if(pass) {\n')
+        f.write('            if (pass) {\n')
         f.write('                String path = WebUtil.getRequest().getSession().'
                 'getServletContext().getRealPath("data");\n')
         f.write('                String fileName = path+"/"+System.currentTimeMillis()+".xlsx";\n')
@@ -111,7 +111,7 @@ def service_export(filename, entity_name, package_name='medicare', input_file='o
         f.write('                    filedisplay = new String(filedisplay.getBytes("UTF-8"), "ISO8859-1");\n')
         f.write('                }\n                fileLength = file.length();\n')
         f.write('                response.reset();\n')
-        f.write('                response.setContentType("application/octet-stream");\n')
+        f.write('                response.setContentType("application/x-msdownload");\n')
         f.write('                response.setHeader("Content-disposition", "attachment;'
                 'filename=\\""+ filedisplay+".xlsx\\";target=_blank");\n')
         f.write('                response.setHeader("Content-Length",String.valueOf(fileLength));\n')
