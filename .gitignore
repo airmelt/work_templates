@@ -126,3 +126,4 @@ main.py
 *.sql
 *.csv
 *.jsp
+*.xml
