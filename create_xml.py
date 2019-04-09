@@ -119,6 +119,12 @@ def create_xml(entity_name, table_name, package_name='medicare', input_file='out
         f.write('    <select id="queryBySql" parameterType="java.lang.String" resultType="java.util.Map">\n')
         f.write('        ${executeSql}\n')
         f.write('    </select>\n\n')
+        f.write('    <delete id="deleteByIds" parameterType="java.lang.String">\n')
+        f.write('        DELETE FROM ' + table_name + ' WHERE PK_ID IN\n')
+        f.write('        <foreach collection="list" item="id" open="(" separator="," close=")">\n')
+        f.write('            #{id}\n')
+        f.write('        </foreach>\n')
+        f.write('    </delete>\n\n')
         f.write('</mapper>')
 
 
