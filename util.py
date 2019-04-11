@@ -53,4 +53,5 @@ def entity_attributes_standardize(entity_name):
     """
     if not entity_name:
         return None
+    entity_name = entity_name.strip()
     return entity_name[0].lower() + entity_name.title().replace('_', '')[1:]
