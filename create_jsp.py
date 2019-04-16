@@ -13,6 +13,7 @@
 __author__ = 'air'
 
 import time
+import util
 
 
 def create_jsp(file_name, url, columns_file='output.txt', comments_file='comment.txt'):
@@ -68,7 +69,7 @@ def create_jsp(file_name, url, columns_file='output.txt', comments_file='comment
         f.write('               rownumbers: true,\n')
         f.write('               loading: true,\n')
         f.write('               fit: true,\n')
-        f.write('               toolbar: "#deptTable_Bar",\n')
+        f.write('               toolbar: "#dataTableBar",\n')
         f.write('               url: \'${ctx}/' + url + '/list.do\',\n')
         f.write('               pagination: true,\n')
         f.write('               pageSize: 20,\n')
@@ -78,9 +79,9 @@ def create_jsp(file_name, url, columns_file='output.txt', comments_file='comment
         with open(comments_file, 'r', encoding='utf-8') as f3:
             titles = f3.readlines()
         for i in range(len(fields)):
-            f.write('                    '
-                    '{field: \'' + fields[i].strip().title().replace('_', '') + '\', title: \'' + titles[i].strip() + '\', width: 120},\n')
-        f.write('\n                ]]\n            });\n\n')
+            f.write('                    {field: \'' + util.entity_attributes_standardize(fields[i])
+                    + '\', title: \'' + titles[i].strip() + '\', width: 120},\n')
+        f.write('                ]]\n            });\n\n')
         f.write('            new CrudForm({datagrid: \'dataTable\'});\n\n')
         f.write('            $("#search").click(function() {\n')
         f.write('                $(\'#dataTable\').datagrid("load", yibo.util.formJson($("#searchForm")));\n')
@@ -89,7 +90,7 @@ def create_jsp(file_name, url, columns_file='output.txt', comments_file='comment
         f.write('<body class="easyui-layout">\n')
         f.write('<div data-options="region:\'center\'" style="padding:0px;border:0px;" data-options="fit:true">\n')
         f.write('    <table id="dataTable"></table>\n')
-        f.write('    <div id="deptTable_Bar">\n')
+        f.write('    <div id="dataTableBar">\n')
         f.write('        <a class="easyui-linkbutton" id="tool-search-btn" '
                 'data-options="plain: true, iconCls: \'layout-button-up\'">查询</a>\n')
         f.write('        <!-- 查询条件 -->\n')

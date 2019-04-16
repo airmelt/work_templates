@@ -24,11 +24,18 @@ def create_xml(entity_name, table_name, package_name='medicare', input_file='out
         f.write('<mapper namespace="com.yibo.modules.' + package_name + '.dao.' + entity_name + 'Dao">\n\n')
         f.write('    <sql id="sql">\n')
         f.write('        ' + table_name + '.PK_ID AS ' + table_name + '_PK_ID, \n')
+        columns = []
+        attributes = []
         with open(input_file, 'r', encoding='utf-8') as f1:
             column = f1.readline().strip()
             while column:
-                f.write('        ' + table_name + '.' + column + ' AS ' + table_name + '_' + column + ', \n')
+                columns.append(column)
+                attributes.append(util.entity_attributes_standardize(column))
                 column = f1.readline().strip()
+        leng = len(columns)
+        for i in range(leng - 1):
+            f.write('        ' + table_name + '.' + columns[i] + ' AS ' + table_name + '_' + columns[i] + ', \n')
+        f.write('        ' + table_name + '.' + columns[-1] + ' AS ' + table_name + '_' + columns[-1] + '\n')
         f.write('    </sql>\n\n')
         f.write('    <resultMap id="BaseResultMap" '
                 'type="com.yibo.modules.' + package_name + '.entity.' + entity_name + '">\n')
@@ -46,14 +53,14 @@ def create_xml(entity_name, table_name, package_name='medicare', input_file='out
         f.write('        <include refid="sql"/>\n')
         f.write('        FROM ' + table_name + '\n')
         f.write('        <where>\n')
-        f.write('            <if test="pkId != null and pkId != '' ">\n')
+        f.write('            <if test="pkId != null and pkId != \'\' ">\n')
         f.write('                ' + table_name + '.PK_ID = #{pkId,jdbcType=VARCHAR}\n')
         f.write('            </if>\n')
         with open(input_file, 'r', encoding='utf-8') as f1:
             column = f1.readline().strip()
             while column:
                 attribute = util.entity_attributes_standardize(column)
-                f.write('            <if test="' + attribute + ' != null and ' + attribute + ' != '' ">\n')
+                f.write('            <if test="' + attribute + ' != null and ' + attribute + ' != \'\' ">\n')
                 f.write('                AND ' + table_name + '.' + column +
                         ' LIKE \'%\' + #{' + attribute + ',jdbcType=VARCHAR} + \'%\'\n')
                 f.write('            </if>\n')
@@ -62,20 +69,11 @@ def create_xml(entity_name, table_name, package_name='medicare', input_file='out
         f.write('        ORDER BY ' + table_name + '.PK_ID\n')
         f.write('    </select>\n\n')
         f.write('    <delete id="delete" parameterType="java.lang.Long">\n')
-        f.write('       DELETE FROM' + table_name + ' WHERE ' + table_name + '.PK_ID =  #{pkId,jdbcType=BIGINT}\n')
+        f.write('       DELETE FROM ' + table_name + ' WHERE ' + table_name + '.PK_ID = #{pkId,jdbcType=BIGINT}\n')
         f.write('    </delete>\n\n')
         f.write('    <insert id="insert" parameterType="com.yibo.modules.' +
                 package_name + '.entity.' + entity_name + '">\n')
         f.write('        INSERT INTO ' + table_name + ' (\n')
-        columns = []
-        attributes = []
-        with open(input_file, 'r', encoding='utf-8') as f1:
-            column = f1.readline().strip()
-            while column:
-                columns.append(column)
-                attributes.append(util.entity_attributes_standardize(column))
-                column = f1.readline().strip()
-        leng = len(columns)
         for i, x in enumerate(columns):
             if i != len(columns) - 1:
                 f.write('        ' + x + ', \n')
