@@ -16,7 +16,10 @@ import time
 import util
 
 
-def create_jsp(file_name, url, columns_file='output.txt', comments_file='comment.txt'):
+def create_jsp(entity_name, package_name='medicare', columns_file='output.txt', comments_file='comment.txt'):
+    entity_name = util.entity_attributes_standardize(entity_name)
+    file_name = entity_name + 'List.jsp'
+    url = package_name + '/' + entity_name
     with open(file_name, 'w', encoding='utf-8') as f:
         f.write('<%--\n')
         f.write('  User: liji@gz-yibo.com\n')
