@@ -120,7 +120,7 @@ def service_export(filename, entity_name, package_name='medicare', input_file='o
         f.write('            if(null != writer) {\n')
         f.write('                response.setContentType("text/html;charset=UTF-8");\n')
         f.write('                writer.print("下载文件时发生错误.");\n')
-        f.write('            }\n        }\n    }\n')
+        f.write('            }\n        }\n    }\n}\n')
 
 
 def dao_export(entity_name, package_name='medicare'):
@@ -188,10 +188,10 @@ def jsp_export(entity_name, package_name='medicare', input_file='output.txt', ):
         with open(input_file, 'r', encoding='utf-8') as f2:
             column = util.entity_attributes_standardize(f2.readline().strip())
             while column:
-                f.write('            $(\'#export input[name="' + column +
+                f.write('               $(\'#export input[name="' + column +
                         '"]\').val($.trim($("#dataTableBar #' + column + '").val()));\n')
                 column = util.entity_attributes_standardize(f2.readline().strip())
-        f.write('           $("#export").submit();\n')
+        f.write('               $("#export").submit();\n')
         f.write('            });\n\n')
         f.write('    <form id="export" enctype="application/x-www-form-urlencoded" method="post" style="display: none" '
                 'target="_blank" action="${ctx}/' + package_name + '/' + entity_name[0].lower() + entity_name[1:] +
