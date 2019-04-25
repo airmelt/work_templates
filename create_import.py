@@ -48,7 +48,7 @@ def reader_import(entity_name, columns_for_read, start_row_num):
         f.write('        long count;\n')
         f.write('        try (SqlSession session = sqlSessionTemplate.getSqlSessionFactory().openSession();\n')
         f.write('             Connection con = session.getConnection();\n')
-        f.write('             PreparedStatement ps = conn.prepareStatement(INSERT_INTO_' + table_name + ')) {\n')
+        f.write('             PreparedStatement ps = con.prepareStatement(INSERT_INTO_' + table_name + ')) {\n')
         f.write('            int columnsForRead = ' + columns_for_read + ';\n')
         f.write('            String yearMonth = String.format("%s%s",\n')
         f.write('                    fileImport.getYear(), fileImport.getMonth() < 10 ? '
@@ -90,7 +90,6 @@ def reader_import(entity_name, columns_for_read, start_row_num):
         f.write('                ps.executeBatch();\n')
         f.write('                con.commit();\n')
         f.write('            }\n')
-        f.write('            ' + entity_name + 'Dao dao = sqlSessionTemplate.getMapper(' + entity_name + 'Dao.class);\n')
         f.write('            count = rowsCount - blankRow;\n')
         f.write('        } catch(Exception e) {\n')
         f.write('            e.printStackTrace();\n')
