@@ -55,3 +55,12 @@ def entity_attributes_standardize(entity_name):
         return None
     entity_name = entity_name.strip()
     return entity_name[0].lower() + entity_name.title().replace('_', '')[1:]
+
+
+def up_case_first_letter(s):
+    """
+    将第一个字母大写, 其余不变
+    :param s:
+    :return:
+    """
+    return s[0].upper() + s[1:]

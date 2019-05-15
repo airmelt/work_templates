@@ -22,9 +22,10 @@ def reader_import(entity_name, columns_for_read, start_row_num):
     :param start_row_num: 要读取的excel开始的行数
     :return:
     """
+    entity_name = util.entity_attributes_standardize(entity_name)
+    entity_name = util.up_case_first_letter(entity_name)
     columns_for_read = str(columns_for_read)
     start_row_num = str(start_row_num)
-    table_name = util.table_name_standardize(entity_name)
     with open(entity_name + 'ExcelHelper.java', 'w', encoding='utf-8') as f:
         f.write('package com.yibo.modules.medicare.reader;\n\n')
         f.write('import com.yibo.core.common.utils.excel.XLSConvertCSVUtil;\n')
@@ -100,17 +101,13 @@ def reader_import(entity_name, columns_for_read, start_row_num):
         f.write('        return count;\n    }\n}\n')
 
 
-def create_sql(entity_name, need_standardize=True, input_file='output.txt'):
+def create_sql(table_name, input_file='output.txt'):
     """
     生成sql文件
-    :param entity_name: 实体类名称
-    :param need_standardize: 是否需要标准化表名
+    :param table_name: 表名称
     :param input_file: 传入文件名
     :return:
     """
-    table_name = entity_name
-    if need_standardize:
-        table_name = util.table_name_standardize(entity_name)
     with open('sql.txt', 'w', encoding='utf-8') as f:
         f.write('String INSERT_INTO_' + table_name.upper() + ' = "INSERT INTO ' + table_name + '(" +\n')
         with open(input_file, 'r', encoding='utf-8') as f2:
