@@ -63,4 +63,17 @@ def up_case_first_letter(s):
     :param s:
     :return:
     """
+    if not s:
+        return None
     return s[0].upper() + s[1:]
+
+
+def low_case_first_letter(s):
+    """
+    将第一个字母小写, 其余不变
+    :param s:
+    :return:
+    """
+    if not s:
+        return None
+    return s[0].lower() + s[1:]
