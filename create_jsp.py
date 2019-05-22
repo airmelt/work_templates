@@ -17,7 +17,7 @@ import util
 
 
 def create_jsp(entity_name, package_name='medicare', columns_file='output.txt', comments_file='comment.txt'):
-    entity_name = util.entity_attributes_standardize(entity_name)
+    entity_name = util.low_case_first_letter(entity_name)
     file_name = entity_name + 'List.jsp'
     url = package_name + '/' + entity_name
     with open(file_name, 'w', encoding='utf-8') as f:
