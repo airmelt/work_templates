@@ -16,8 +16,6 @@ import util
 
 
 def create_xml(entity_name, table_name, package_name='medicare', input_file='output.txt'):
-    entity_name = util.entity_attributes_standardize(entity_name)
-    entity_name = util.up_case_first_letter(entity_name)
     output_file = entity_name + '.xml'
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
