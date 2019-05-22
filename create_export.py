@@ -30,10 +30,10 @@ def controller_export(entity_name, output_file='controller_export.java'):
         f.write(entity_name + '(request, response);\n    }\n')
 
 
-def service_export(filename, entity_name, package_name='medicare', input_file='output.txt', comment_file = 'comment.txt'):
+def service_export(table_comment, entity_name, package_name='medicare', input_file='output.txt', comment_file = 'comment.txt'):
     """
     创建Service层导出文件
-    :param filename: 导出的文件名
+    :param table_comment: 导出的文件名
     :param entity_name: 传入实体类名称
     :param package_name: 实体类的包名
     :param input_file: 传入数据库字段名称txt文件
@@ -45,21 +45,31 @@ def service_export(filename, entity_name, package_name='medicare', input_file='o
         f.write('package com.yibo.modules.' + package_name + '.service;\n\n')
         f.write('import com.yibo.core.common.service.CrudService;\n')
         f.write('import com.yibo.core.common.utils.WebUtil;\n')
+        f.write('import com.yibo.core.common.utils.excel.XSSFWriteExt;\n')
+        f.write('import org.apache.commons.collections.CollectionUtils;\n')
         f.write('import org.springframework.beans.factory.annotation.Autowired;\n')
         f.write('import org.springframework.stereotype.Service;\n')
         f.write('import org.springframework.transaction.annotation.Transactional;\n')
         f.write('import com.yibo.modules.' + package_name + '.entity.' + entity_name + ';\n')
-        f.write('import com.yibo.modules.' + package_name + '.dao.' + entity_name + 'Dao;\n\n')
+        f.write('import com.yibo.modules.' + package_name + '.dao.' + entity_name + 'Dao;\n')
+        f.write('import org.springframework.util.FileCopyUtils;\n\n')
+        f.write('import javax.servlet.http.HttpServletRequest;\n')
+        f.write('import javax.servlet.http.HttpServletResponse;\n')
+        f.write('import java.io.File;\n')
+        f.write('import java.io.FileInputStream;\n')
+        f.write('import java.io.PrintWriter;\n')
+        f.write('import java.net.URLEncoder;\n')
         f.write('import java.sql.SQLException;\n')
         f.write('import java.util.ArrayList;\n')
+        f.write('import java.util.Date;\n')
         f.write('import java.util.List;\n')
         f.write('import java.util.Map;\n\n\n')
         f.write('@Service\n')
         f.write('@Transactional(readOnly = true)\n')
         f.write('public class ' + entity_name + 'Service extends CrudService'
-                                                '<' + entity_name + 'Dao, ' + entity_name + 'His> {\n\n')
+                                                '<' + entity_name + 'Dao, ' + entity_name + '> {\n\n')
         f.write('    @Autowired\n')
-        f.write('    private ' + entity_name + 'Dao ' + entity_name[0].lower() + entity_name[1:] + 'Dao;\n\n')
+        f.write('    private ' + entity_name + 'Dao dao;\n\n')
         f.write('    private List<List<Object>> getExport() throws SQLException {\n')
         f.write('        return export();\n    }\n\n')
         f.write('    private List<List<Object>> export() throws SQLException {\n')
@@ -102,7 +112,7 @@ def service_export(filename, entity_name, package_name='medicare', input_file='o
         f.write('                XSSFWriteExt.writeToExcel(data, fileName, header);\n')
         f.write('                long fileLength = 0;\n')
         f.write('                File file = new File(fileName);\n\n')
-        f.write('                String filedisplay = "' + filename + '_"+new Date().getTime();\n')
+        f.write('                String filedisplay = "' + table_comment + '_"+new Date().getTime();\n')
         f.write('                String agent = request.getHeader("User-Agent").toUpperCase();\n')
         f.write('                if (agent.indexOf("MSIE") > 0 || (agent.indexOf("GECKO") > 0 && '
                 'agent.indexOf("RV:11") > 0)) {\n')
@@ -161,15 +171,13 @@ def xml_export(table_name, input_file='output.txt', output_file='export_xml.txt'
         f.write('                ' + table_name + '.PK_ID = #{pkId,jdbcType=INTEGER}\n')
         f.write('            </if>\n')
         with open(input_file, 'r', encoding='utf-8') as f2:
-            column = f2.readline().strip().title().replace('_', '')
+            column = util.entity_attributes_standardize(f2.readline().strip())
             while column:
                 f.write('            <if test="' + column + ' != null and ' + column + ' != \'\'">\n')
-                f.write('                AND ' + table_name + '.' + column + ' = #{'
-                        + column + ',jdbcType=VARCHAR}\n')
+                f.write('                AND ' + table_name + '.' + column + ' LIKE \'%\' + #{'
+                        + column + ',jdbcType=VARCHAR} + \'%\'\n')
                 f.write('            </if>\n')
-                column = f2.readline().strip()
-                column = string.capwords(column.replace('_', ' ').lower())
-                column = ''.join(column.split(' '))
+                column = util.entity_attributes_standardize(f2.readline().strip())
         f.write('        </where>\n')
         f.write('        order by ' + table_name + '.PK_ID\n    </select>\n')
 
@@ -182,6 +190,7 @@ def jsp_export(entity_name, package_name='medicare', input_file='output.txt', ):
     :param input_file: 传入数据库字段名称txt文件
     :return:
     """
+    entity_name = util.low_case_first_letter(entity_name)
     with open(entity_name + 'Export.jsp', 'w', encoding='utf-8') as f:
         f.write('            //数据导出功能\n')
         f.write('            $(\'#exportBtn\').click(function () {\n')
@@ -194,16 +203,12 @@ def jsp_export(entity_name, package_name='medicare', input_file='output.txt', ):
         f.write('               $("#export").submit();\n')
         f.write('            });\n\n')
         f.write('    <form id="export" enctype="application/x-www-form-urlencoded" method="post" style="display: none" '
-                'target="_blank" action="${ctx}/' + package_name + '/' + entity_name[0].lower() + entity_name[1:] +
-                '/export.json">\n')
+                'target="_blank" action="${ctx}/' + package_name + '/' + entity_name + '/export.json">\n')
         with open(input_file, 'r', encoding='utf-8') as f2:
-            column = f2.readline().strip().title().replace('_', '')
-            column = column[0].lower() + column[1:]
+            column = util.entity_attributes_standardize(f2.readline().strip())
             while column:
                 f.write('        <input name="' + column + '">\n')
-                column = f2.readline().strip().title().replace('_', '')
-                if column:
-                    column = column[0].lower() + column[1:]
+                column = util.entity_attributes_standardize(f2.readline().strip())
         f.write('    </form>\n\n')
         f.write('            <a id="exportBtn" href="javascript:void(0)" class="easyui-linkbutton" '
                 'iconCls="icon-save" plain="true">数据导出</a>')
