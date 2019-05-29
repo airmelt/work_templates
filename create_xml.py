@@ -16,6 +16,14 @@ import util
 
 
 def create_xml(entity_name, table_name, package_name='medicare', input_file='output.txt'):
+    """
+    生成Mybatis的xml文件
+    :param entity_name: 实体类名
+    :param table_name: 表名
+    :param package_name: 包名
+    :param input_file: 传入字段名文件
+    :return:
+    """
     output_file = entity_name + '.xml'
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n')

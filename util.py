@@ -60,7 +60,7 @@ def entity_attributes_standardize(entity_name):
 def up_case_first_letter(s):
     """
     将第一个字母大写, 其余不变
-    :param s:
+    :param s: 传入字符串
     :return:
     """
     if not s:
@@ -71,7 +71,7 @@ def up_case_first_letter(s):
 def low_case_first_letter(s):
     """
     将第一个字母小写, 其余不变
-    :param s:
+    :param s: 传入字符串
     :return:
     """
     if not s:
