@@ -14,14 +14,15 @@ import util
 __author__ = 'air'
 
 
-def reader_import(entity_name, columns_for_read, start_row_num):
+def reader_import(table_name, columns_for_read, start_row_num):
     """
     生成readerHelper文件
-    :param entity_name: 实体类名称
+    :param table_name: 表名称
     :param columns_for_read: 要读取的excel列数
     :param start_row_num: 要读取的excel开始的行数
     :return:
     """
+    entity_name = table_name
     entity_name = util.entity_attributes_standardize(entity_name)
     entity_name = util.up_case_first_letter(entity_name)
     columns_for_read = str(columns_for_read)
@@ -119,8 +120,114 @@ def create_sql(table_name, input_file='output.txt'):
         f.write('        "values(' + ('?,' * (len(columns) + 1)) + '?)";')
 
 
-def create_jsp():
-    pass
+def create_jsp(table_name, output_file='output.txt'):
+    """
+    生成jsp文件
+    :param table_name: 传入表名
+    :param output_file: 传入字段名文件
+    :return:
+    """
+    file_name = 'import.jsp'
+    with open(file_name, 'w', encoding='utf-8') as f:
+
+        f.write('            $(\'#importBtn\').bind(\'click\', function () {  \n')
+        f.write('                $(\'#file-action\').form(\'clear\');   \n')
+        f.write('                $(\'#file-action\').form(\'reset\');   \n')
+        f.write('                $(\'#file-action #filecontainer input\').val(\'\');\n')
+        f.write('                $(\'#dataType\').val(\'' + table_name + '\');\n')
+        f.write('                $(\'#import-dialog\').dialog(\'open\');\n')
+        f.write('            });\n\n')
+        f.write('            $(\'#import\').bind(\'click\', function () {\n')
+        f.write('                var isValid = $(\'#file-action\').form(\'validate\');\n')
+        f.write('                if (isValid) {\n                    $(\'#file-action\').submit();\n')
+        f.write('                    $.messager.progress();\n                }\n')
+        f.write('            });\n\n')
+        f.write('        function ajaxFormCallback(json) {\n')
+        f.write('            var isjson = Object.prototype.toString.call(json).toLowerCase() == "[object object]";\n')
+        f.write('            if (isjson && json.success) {\n')
+        f.write('                $(\'#import-dialog\').dialog(\'close\');\n')
+        f.write('                $.messager.alert(\'消息\', json.message, \'info\');\n')
+        f.write('                setTimeout(function () {\n')
+        f.write('                    $(\'#dataTable\').datagrid(\'load\', {\n')
+        with open(output_file, 'r', encoding='utf-8') as f2:
+            columns = f2.readlines()
+            for column in columns:
+                column = util.entity_attributes_standardize(column.strip())
+                f.write('                        ' + column + ': $(\'#' + column + '\').val(),\n')
+        f.write('                    });\n                }, 2);\n')
+        f.write('            } else {\n')
+        f.write('                $.messager.alert(\'错误\', json.message, \'error\');\n            }\n')
+        f.write('            $.messager.progress(\'close\');\n        }\n\n')
+        f.write('        <a id="importBtn" href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" '
+                'plain="true">导入</a>\n\n')
+        f.write('    <div id="import-dialog" class="easyui-dialog"\n')
+        f.write('         title="Excel导入"\n')
+        f.write('         buttons="#import-tools"\n')
+        f.write('         closed="true"\n')
+        f.write('         cache="false"\n')
+        f.write('         style="width:450px; height:300px"\n')
+        f.write('         iconCls="icon-edit"\n')
+        f.write('         modal="true">\n')
+        f.write('        <iframe id="file-target" name="file-target" style="display: none"></iframe>\n')
+        f.write('        <div class="modal-body">\n')
+        f.write('            <form action="${ctx}/file/multipart.json" id="file-action" method="post" '
+                'enctype="multipart/form-data"\n')
+        f.write('                  class="form-horizontal" target="file-target">\n')
+        f.write('                <input name="user" type="hidden" value="${login_name}"/>\n')
+        f.write('                <div class="control-group">\n')
+        f.write('                    <label class="control-label">是否覆盖：</label>\n')
+        f.write('                    <div class="controls">\n')
+        f.write('                        <select id="recover" name="recover" class="easyui-combobox" '
+                'style="width:150px;"\n')
+        f.write('                                required="required">\n')
+        f.write('                            <option value="0">否</option>\n')
+        f.write('                            <option value="1">是</option>\n')
+        f.write('                        </select>\n')
+        f.write('                    </div>\n                </div>\n')
+        f.write('                <div class="control-group" style="display:none">\n')
+        f.write('                    <label class="control-label">数据类型：</label>\n')
+        f.write('                    <div class="controls">\n')
+        f.write('                        <input id="dataType" name="dataType" class="easyui-textbox" '
+                'style="width:150px;" type="text"/>\n')
+        f.write('                    </div>\n                </div>\n')
+        f.write('                <div class="control-group">\n')
+        f.write('                    <label class="control-label">年份：</label>\n')
+        f.write('                    <div class="controls">\n')
+        f.write('                        <select class="easyui-combobox" name="year" style="width:150px;" '
+                'required="required">\n')
+        f.write('                            <c:forEach items="${years}" var="d">\n')
+        f.write('                                <option value="${d}">${d}年</option>\n')
+        f.write('                            </c:forEach>\n')
+        f.write('                        </select>\n')
+        f.write('                    </div>\n')
+        f.write('                </div>\n')
+        f.write('                <div class="control-group">\n')
+        f.write('                    <label class="control-label">月份：</label>\n')
+        f.write('                    <div class="controls">\n')
+        f.write('                        <select class="easyui-combobox" name="month" style="width:150px;" '
+                'required="required">\n')
+        f.write('                            <c:forEach items="1,2,3,4,5,6,7,8,9,10,11,12" var="m" step="1">\n')
+        f.write('                                <option value="${m}">${m}月</option>\n')
+        f.write('                            </c:forEach>\n')
+        f.write('                            <option value="13">全年</option>\n')
+        f.write('                        </select>\n')
+        f.write('                    </div>\n')
+        f.write('                </div>\n')
+        f.write('                <div class="control-group">\n')
+        f.write('                    <label class="control-label">数据文件：</label>\n')
+        f.write('                    <div class="controls">\n')
+        f.write('                        <input name="file" type="file" style="width:200px" required="required"\n')
+        f.write('                               value="选择..."/>\n')
+        f.write('                    </div>\n')
+        f.write('                </div>\n')
+        f.write('            </form>\n')
+        f.write('        </div>\n    </div>\n')
+        f.write('    <div id="import-tools">\n')
+        f.write('        <a id="import" href="javascript:void(0)" class="easyui-linkbutton" '
+                'iconCls="icon-save">保存</a>\n')
+        f.write('        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"\n')
+        f.write('           onclick="javascript:$(\'#importDialog\').dialog(\'close\')">关闭</a>\n')
+        f.write('    </div>\n')
 
 
 if __name__ == '__main__':
