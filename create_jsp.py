@@ -17,6 +17,14 @@ import util
 
 
 def create_jsp(entity_name, package_name='medicare', columns_file='output.txt', comments_file='comment.txt'):
+    """
+    生成jsp文件
+    :param entity_name: 实体类名
+    :param package_name: 包名
+    :param columns_file: 传入字段名文件
+    :param comments_file: 传入注释名文件
+    :return:
+    """
     entity_name = util.low_case_first_letter(entity_name)
     file_name = entity_name + 'List.jsp'
     url = package_name + '/' + entity_name
