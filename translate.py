@@ -164,5 +164,24 @@ def excel2txt(input_file, row=0, begin_column=0, output_file='output.txt'):
             f.write(item + '\n')
 
 
+def txt2txt(input_file="comment.txt", output_file='output.txt'):
+    """
+    将传入的文件提取, 并转化成txt, 每一行对应一个翻译结果
+    :param input_file: 传入txt文件名
+    :param output_file: 生成的txt文件名
+    :return:
+    """
+    with open(input_file, 'r', encoding='utf-8') as f:
+        text_list = f.readlines()
+    with open(output_file, 'w', encoding='utf-8') as f:
+        for item in text_list:
+            item = ''.join(item.split())
+            item = translate(item).upper()
+            item = item.replace(' ', '_')
+            print(item)
+            sleep(1)
+            f.write(item + '\n')
+
+
 if __name__ == '__main__':
     excel2txt(r'201802月新版居民.xls', 3, 1, 'output2.txt')
