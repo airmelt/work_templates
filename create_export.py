@@ -12,7 +12,6 @@
 
 __author__ = 'air'
 
-import string
 import util
 
 

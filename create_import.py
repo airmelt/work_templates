@@ -113,11 +113,10 @@ def create_sql(table_name, input_file='output.txt'):
         f.write('String INSERT_INTO_' + table_name.upper() + ' = "INSERT INTO ' + table_name + '(" +\n')
         with open(input_file, 'r', encoding='utf-8') as f2:
             columns = f2.readlines()
-            for column in columns:
-                f.write('        "' + column.strip() + '," +\n')
-        f.write('        "FCreateUser," +\n')
-        f.write('        "FYearMonth)" +\n')
-        f.write('        "values(' + ('?,' * (len(columns) + 1)) + '?)";')
+            for i in range(len(columns) - 1):
+                f.write('        "' + columns[i].strip() + '," +\n')
+            f.write('        "' + columns[-1].strip() + ') " +\n')
+        f.write('        "VALUES(' + ('?,' * (len(columns) - 1)) + '?)";')
 
 
 def create_jsp(table_name, output_file='output.txt'):
@@ -128,6 +127,7 @@ def create_jsp(table_name, output_file='output.txt'):
     :return:
     """
     file_name = 'import.jsp'
+    entity_name = util.up_case_first_letter(util.entity_attributes_standardize(table_name))
     with open(file_name, 'w', encoding='utf-8') as f:
 
         f.write('            $(\'#importBtn\').bind(\'click\', function () {  \n')
@@ -227,7 +227,15 @@ def create_jsp(table_name, output_file='output.txt'):
                 'iconCls="icon-save">保存</a>\n')
         f.write('        <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel"\n')
         f.write('           onclick="javascript:$(\'#importDialog\').dialog(\'close\')">关闭</a>\n')
-        f.write('    </div>\n')
+        f.write('    </div>\n\n')
+        f.write('    void deleteByYearMonth(@Param("yearMonth") String yearMonth);\n\n')
+        f.write('    <delete id="deleteByYearMonth" parameterType="java.lang.String">\n')
+        f.write('        DELETE FROM' + table_name + 'WHERE YEAR_MONTH = #{yearMonth, jdbcType = VARCHAR}\n')
+        f.write('    </delete>\n\n')
+        f.write('							case ' + table_name + ':\n')
+        f.write('								count = ' + entity_name + 'ExcelHelper.insert(originalFilename, file, '
+                'fileImport, sqlSessionTemplate);\n')
+        f.write('								break;\n')
 
 
 if __name__ == '__main__':
