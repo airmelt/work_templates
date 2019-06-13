@@ -108,13 +108,31 @@ def create_jsp(entity_name, package_name='medicare', columns_file='output.txt', 
         f.write('        <form id="searchForm" class="breadcrumb form-search" style="display:none" method="post">\n')
         f.write('            <table>\n')
         f.write('                <tr>\n')
-        f.write('                    <th>搜索条件1:</th>\n')
-        f.write('                    <td><input type="text" name="搜索条件1"/></td>\n')
-        f.write('                    <th>搜索条件2:</th>\n')
-        f.write('                    <td><input type="text" name="搜索条件2"/></td>\n')
         f.write('                    <td style="text-align: center"><input id="search" '
                 'class="btn btn-primary search-btn" type="button" value="查询" style="line-height:15px"/></td>\n')
         f.write('                </tr>\n')
         f.write('            </table>\n')
         f.write('        </form>\n')
         f.write('    </div>\n</div>\n</body>\n</html>\n\n')
+
+
+def create_search(search_file="search.txt"):
+    """
+    添加搜索条件
+    :param search_file: 搜索条件文本文件
+    :return:
+    """
+    with open('search.jsp', 'w', encoding='utf-8') as f:
+        with open(search_file, 'r', encoding='utf-8') as f2:
+            search = f2.readlines()
+        for i in range(len(search)):
+            item = search[i].split(' ')
+            item[-1] = util.entity_attributes_standardize(item[-1].strip())
+            if i % 3 == 0:
+                f.write('                <tr>\n')
+            f.write('                    <th>' + item[0] + ':</th>\n')
+            f.write('                    <td><input type="text" name="' + item[-1] + '" id="' + item[-1] + '"/></td>\n')
+            if i % 3 == 2:
+                f.write('                </tr>\n')
+        if len(search) % 3 != 0:
+            f.write('                </tr>\n')
