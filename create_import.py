@@ -230,7 +230,7 @@ def create_jsp(table_name, output_file='output.txt'):
         f.write('    </div>\n\n')
         f.write('    void deleteByYearMonth(@Param("yearMonth") String yearMonth);\n\n')
         f.write('    <delete id="deleteByYearMonth" parameterType="java.lang.String">\n')
-        f.write('        DELETE FROM' + table_name + 'WHERE YEAR_MONTH = #{yearMonth, jdbcType = VARCHAR}\n')
+        f.write('        DELETE FROM ' + table_name + ' WHERE YEAR_MONTH = #{yearMonth, jdbcType = VARCHAR}\n')
         f.write('    </delete>\n\n')
         f.write('							case ' + table_name + ':\n')
         f.write('								count = ' + entity_name + 'ExcelHelper.insert(originalFilename, file, '
