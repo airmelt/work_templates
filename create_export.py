@@ -170,13 +170,15 @@ def xml_export(table_name, input_file='output.txt', output_file='export_xml.txt'
         f.write('                ' + table_name + '.PK_ID = #{pkId,jdbcType=INTEGER}\n')
         f.write('            </if>\n')
         with open(input_file, 'r', encoding='utf-8') as f2:
-            column = util.entity_attributes_standardize(f2.readline().strip())
+            column = f2.readline().strip()
+            attribute = util.entity_attributes_standardize(column)
             while column:
-                f.write('            <if test="' + column + ' != null and ' + column + ' != \'\'">\n')
+                f.write('            <if test="' + attribute + ' != null and ' + attribute + ' != \'\'">\n')
                 f.write('                AND ' + table_name + '.' + column + ' LIKE \'%\' + #{'
-                        + column + ',jdbcType=VARCHAR} + \'%\'\n')
+                        + attribute + ',jdbcType=VARCHAR} + \'%\'\n')
                 f.write('            </if>\n')
-                column = util.entity_attributes_standardize(f2.readline().strip())
+                column = f2.readline().strip()
+                attribute = util.entity_attributes_standardize(column)
         f.write('        </where>\n')
         f.write('        order by ' + table_name + '.PK_ID\n    </select>\n')
 
