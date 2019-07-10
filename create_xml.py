@@ -96,7 +96,7 @@ def create_xml(entity_name, table_name, package_name='medicare', input_file='out
             f.write('        #{' + x + ', jdbcType = VARCHAR}\n')
         f.write('        )\n')
         f.write('    </insert>\n\n')
-        f.write('    <update id="update" parameterType="com.yibo.modules.' +
+        f.write('    <update id="updateNull" parameterType="com.yibo.modules.' +
                 package_name + '.entity.' + entity_name + '">\n')
         f.write('        UPDATE ' + table_name + '\n')
         f.write('        <set>\n')
@@ -106,7 +106,7 @@ def create_xml(entity_name, table_name, package_name='medicare', input_file='out
         f.write('        </set>\n')
         f.write('        WHERE ' + table_name + '.PK_ID = #{pkId, jdbcType = BIGINT}\n')
         f.write('    </update>\n\n')
-        f.write('    <update id="updateNull" parameterType="com.yibo.modules.' +
+        f.write('    <update id="update" parameterType="com.yibo.modules.' +
                 package_name + '.entity.' + entity_name + '">\n')
         f.write('        UPDATE ' + table_name + '\n')
         f.write('        <set>\n')
